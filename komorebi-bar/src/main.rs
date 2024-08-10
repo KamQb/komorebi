@@ -1,9 +1,11 @@
+mod cpu;
 mod date;
 mod memory;
 mod storage;
 mod time;
 mod widget;
 
+use crate::cpu::Cpu;
 use crate::date::Date;
 use crate::memory::Memory;
 use crate::storage::Storage;
@@ -149,6 +151,7 @@ struct Komobar {
     time: Time,
     date: Date,
     memory: Memory,
+    cpu: Cpu,
     storage: Storage,
 }
 
@@ -171,6 +174,7 @@ impl Komobar {
             time: Time::default(),
             date: Date::default(),
             memory: Memory::default(),
+            cpu: Cpu::default(),
             storage: Storage::default(),
         }
     }
@@ -285,6 +289,21 @@ impl eframe::App for Komobar {
                             if ui
                                 // TODO: make label configurable??
                                 .label(format!("🐏 {}", ram))
+                                .on_hover_cursor(CursorIcon::default())
+                                .clicked()
+                            {
+                                if let Err(error) =
+                                    Command::new("cmd.exe").args(["/C", "taskmgr.exe"]).output()
+                                {
+                                    eprintln!("{}", error)
+                                }
+                            };
+                        }
+
+                        for cpu in self.cpu.output() {
+                            if ui
+                                // TODO: make label configurable??
+                                .label(format!("💻 {}", cpu))
                                 .on_hover_cursor(CursorIcon::default())
                                 .clicked()
                             {
