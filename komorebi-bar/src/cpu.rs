@@ -12,7 +12,9 @@ pub struct Cpu {
 impl Default for Cpu {
     fn default() -> Self {
         Self {
-            system: System::new_with_specifics(RefreshKind::default()),
+            system: System::new_with_specifics(
+                RefreshKind::default().without_memory().without_processes(),
+            ),
             no_of_samples: 100,
             current_cpu_usage: 0.0,
             current_sample: 0,
