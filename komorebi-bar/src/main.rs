@@ -19,6 +19,8 @@ use eframe::egui::ViewportBuilder;
 use eframe::egui::Visuals;
 use eframe::emath::Pos2;
 use eframe::emath::Vec2;
+use eframe::glow::FILL;
+use eframe::WindowBuilder;
 use komorebi_client::SocketMessage;
 use std::io::BufRead;
 use std::io::BufReader;
@@ -63,28 +65,34 @@ pub struct Config {
 
 fn main() -> eframe::Result<()> {
     let config = Config {
-        inner_size: Position { x: 5120.0, y: 20.0 },
-        position: Position { x: 0.0, y: 0.0 },
-        outer_margin: Position { x: 10.0, y: 10.0 },
+        inner_size: Position { x: 70.0, y: 1440.0 },
+        position: Position { x: 5050.0, y: 0.0 },
+        outer_margin: Position { x: 1.0, y: 1.0 },
         transparent: false,
         monitor_index: 0,
         monitor_work_area_offset: Some(komorebi_client::Rect {
             left: 0,
-            top: 40,
-            right: 0,
-            bottom: 40,
+            top: 0,
+            right: 70,
+            bottom: 0,
         }),
     };
 
     // TODO: ensure that config.monitor_index represents a valid komorebi monitor index
 
     let native_options = eframe::NativeOptions {
+        persist_window: true,
         viewport: ViewportBuilder::default()
+            .with_taskbar(false)
+            .with_close_button(false)
+            .with_minimize_button(false)
+            .with_maximize_button(false)
             .with_decorations(false)
             .with_transparent(config.transparent)
             .with_position(config.position)
-            .with_inner_size(config.inner_size),
-        ..Default::default()
+            .with_inner_size(config.inner_size)
+            .with_max_inner_size(config.inner_size),
+        ..Default::default() // window_builder: WindowBuilder::default().with_inner_size(config.inner_size),
     };
 
     if let Some(rect) = &config.monitor_work_area_offset {
@@ -212,7 +220,6 @@ impl eframe::App for Komobar {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.handle_komorebi_notification();
-
         egui::CentralPanel::default()
             .frame(
                 egui::Frame::none()
@@ -223,8 +230,8 @@ impl eframe::App for Komobar {
                     )),
             )
             .show(ctx, |ui| {
-                ui.horizontal(|ui| {
-                    ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
+                ui.vertical(|ui| {
+                    ui.with_layout(Layout::top_down(Align::Center), |ui| {
                         // TODO: maybe this should be a widget??
                         for (i, ws) in self.workspaces.iter().enumerate() {
                             if ui
@@ -255,7 +262,7 @@ impl eframe::App for Komobar {
 
                     // TODO: make the order configurable
                     // TODO: make each widget optional??
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                    ui.with_layout(Layout::bottom_up(Align::Center), |ui| {
                         for time in self.time.output() {
                             ctx.request_repaint();
                             if ui
