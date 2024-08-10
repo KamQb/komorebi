@@ -19,8 +19,6 @@ use eframe::egui::ViewportBuilder;
 use eframe::egui::Visuals;
 use eframe::emath::Pos2;
 use eframe::emath::Vec2;
-use eframe::glow::FILL;
-use eframe::WindowBuilder;
 use komorebi_client::SocketMessage;
 use std::io::BufRead;
 use std::io::BufReader;
